@@ -18,21 +18,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class HealthController {
     private final ApplicationInfoManager applicationInfoManager;
-    @PostMapping("health-check/fail")
+    @PostMapping("/health-check/fail")
     public ResponseEntity<Void> stop() {
         applicationInfoManager.setInstanceStatus(InstanceInfo.InstanceStatus.DOWN);
         return ResponseEntity.badRequest()
             .build();
     }
 
-    @PostMapping("health-check/recover")
+    @PostMapping("/health-check/recover")
     public ResponseEntity<Void> start() {
         applicationInfoManager.setInstanceStatus(InstanceInfo.InstanceStatus.UP);
         return ResponseEntity.ok()
             .build();
     }
 
-    @GetMapping("health-check")
+    @GetMapping("/health-check")
     public ResponseEntity<InstanceInfo.InstanceStatus> check() {
         return ResponseEntity.ok(applicationInfoManager
             .getInfo()
