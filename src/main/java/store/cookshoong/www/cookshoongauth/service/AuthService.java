@@ -54,15 +54,15 @@ public class AuthService {
         String status = accountInfo.getStatus();
         String accountId = accountInfo.getAccountId();
 
-        String jid = UUID.randomUUID().toString();
-        String accessToken = jwtProvider.createAccessToken(jid, authority);
-        String refreshToken = jwtProvider.createRefreshToken(jid, accountId, status, loginId);
+        String jti = UUID.randomUUID().toString();
+        String accessToken = jwtProvider.createAccessToken(jti, authority);
+        String refreshToken = jwtProvider.createRefreshToken(jti, accountId, status, loginId);
 
-        saveRefreshToken(jid, refreshToken);
+        saveRefreshToken(jti, refreshToken);
         return new LoginSuccessResponseDto(accessToken, refreshToken);
     }
 
-    public void saveRefreshToken(String jid, String refreshToken) {
+    public void saveRefreshToken(String jti, String refreshToken) {
         // TODO: redis에 RefreshToken 저장.
     }
 }

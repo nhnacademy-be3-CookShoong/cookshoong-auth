@@ -20,13 +20,13 @@ public class JsonWebTokenProvider {
     /**
      * 토큰 식별자와 회원의 권한을 담은 액세스 토큰을 만든다.
      *
-     * @param jid       the jid
+     * @param jti       the jti
      * @param authority the authority
      * @return the string
      */
-    public String createAccessToken(String jid, String authority) {
+    public String createAccessToken(String jti, String authority) {
         Map<String, Object> payloads = new HashMap<>();
-        payloads.put("jid", jid);
+        payloads.put("jti", jti);
         payloads.put("authority", authority);
         return createAccessToken(payloads);
     }
@@ -38,15 +38,15 @@ public class JsonWebTokenProvider {
     /**
      * 토큰 식별자와 회원 시퀀스, 회원 상태, 회원의 아이디를 담은 액세스 토큰을 만든다.
      *
-     * @param jid       the jid
+     * @param jti       the jti
      * @param accountId the account id
      * @param status    the status
      * @param loginId   the login id
      * @return the string
      */
-    public String createRefreshToken(String jid, String accountId, String status, String loginId) {
+    public String createRefreshToken(String jti, String accountId, String status, String loginId) {
         Map<String, Object> payloads = new HashMap<>();
-        payloads.put("jid", jid);
+        payloads.put("jti", jti);
         payloads.put("accountId", accountId);
         payloads.put("status", status);
         payloads.put("loginId", loginId);
