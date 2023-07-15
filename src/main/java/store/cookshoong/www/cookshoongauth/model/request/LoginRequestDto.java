@@ -1,5 +1,6 @@
 package store.cookshoong.www.cookshoongauth.model.request;
 
+import javax.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LoginRequestDto {
+    @NotBlank
     private String loginId;
+    @NotBlank
     private String password;
 }

@@ -14,6 +14,11 @@ import org.springframework.web.client.RestTemplate;
  */
 @Configuration
 public class RestTemplateConfig {
+    /**
+     * 기본 RestTemplate 을 Bean 으로 등록한다.
+     *
+     * @return the rest template
+     */
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplateBuilder().setConnectTimeout(Duration.ofSeconds(10))

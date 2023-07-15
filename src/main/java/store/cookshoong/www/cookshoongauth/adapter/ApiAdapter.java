@@ -21,6 +21,12 @@ public class ApiAdapter {
     private final RestTemplate restTemplate;
     private final ApiProperties apiProperties;
 
+    /**
+     * 자격증명정보를 백엔드 서버에 호출한다.
+     *
+     * @param loginRequestDto the login request dto
+     * @return the authentication response dto
+     */
     public AuthenticationResponseDto fetchCredential(LoginRequestDto loginRequestDto) {
         URI uri = UriComponentsBuilder.fromUriString(apiProperties.getGatewayUri())
             .pathSegment("api")

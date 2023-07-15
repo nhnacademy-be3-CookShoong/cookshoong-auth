@@ -5,7 +5,7 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Jwt 관련 설정값들을 담고 있는 클래스
+ * Jwt 관련 설정값들을 담고 있는 클래스.
  *
  * @author koesnam (추만석)
  * @since 2023.07.14

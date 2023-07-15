@@ -18,7 +18,17 @@ import javax.crypto.SecretKey;
 public class JwtFactory {
     private JwtFactory() {}
 
-    public static String createToken(Map<String, Object> headers, Map<String, Object> payloads, String secret, int ttl) {
+    /**
+     * Jwt 토큰을 발행하는 메서드.
+     *
+     * @param headers  the headers
+     * @param payloads the payloads
+     * @param secret   the secret
+     * @param ttl      the ttl
+     * @return the string
+     */
+    public static String createToken(Map<String, Object> headers, Map<String, Object> payloads, String secret,
+                                     int ttl) {
         SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 
         Date expireTime = new Date();

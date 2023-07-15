@@ -26,6 +26,12 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JsonWebTokenProvider jwtProvider;
 
+    /**
+     * 인증 처리하는 메서드.
+     *
+     * @param loginRequestDto the login request dto
+     * @return the account info
+     */
     public AccountInfo executeAuthentication(LoginRequestDto loginRequestDto) {
         AuthenticationResponseDto credential = apiAdapter.fetchCredential(loginRequestDto);
 
@@ -36,6 +42,12 @@ public class AuthService {
         return new AccountInfo(credential);
     }
 
+    /**
+     * 토큰(액세스, 리프레쉬)에 회원정보를 담아서 발행해주는 메서드.
+     *
+     * @param accountInfo the account info
+     * @return the login success response dto
+     */
     public LoginSuccessResponseDto issueTokens(AccountInfo accountInfo) {
         String loginId = accountInfo.getLoginId();
         String authority = accountInfo.getAuthority();

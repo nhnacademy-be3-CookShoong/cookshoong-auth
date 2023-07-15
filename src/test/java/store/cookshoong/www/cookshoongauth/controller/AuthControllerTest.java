@@ -94,6 +94,7 @@ class AuthControllerTest {
     @DisplayName("로그인 - 검증 실패일 때")
     @WithMockUser
     void login2() throws Exception {
+        // ISSUE: Body가 비어서 옴. (테스트환경에서만)
         LoginRequestDto testDto = ReflectionUtils.newInstance(LoginRequestDto.class);
         ReflectionTestUtils.setField(testDto, "loginId", "testUser1");
         ReflectionTestUtils.setField(testDto, "password", "12321532");

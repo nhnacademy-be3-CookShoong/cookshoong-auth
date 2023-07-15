@@ -7,6 +7,12 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.eureka.EurekaClientAutoConfiguration;
 import org.springframework.cloud.netflix.eureka.EurekaDiscoveryClientConfiguration;
 
+/**
+ * 애플리케이션 엔트리포인트.
+ *
+ * @author koesnam (추만석)
+ * @since 2023.07.03
+ */
 @ConfigurationPropertiesScan
 @EnableDiscoveryClient
 @SpringBootApplication(exclude = {EurekaClientAutoConfiguration.class, EurekaDiscoveryClientConfiguration.class})

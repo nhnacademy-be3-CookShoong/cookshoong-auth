@@ -16,8 +16,13 @@ public class AccountInfo {
     private final String authority;
     private final String status;
 
+    /**
+     * 인증조회정보를 기반으로 회원정보 생성.
+     *
+     * @param dto the dto
+     */
     public AccountInfo(AuthenticationResponseDto dto) {
-        this.accountId = String.valueOf(dto.getAttributes().get("accountId")) ;
+        this.accountId = String.valueOf(dto.getAttributes().get("accountId"));
         this.loginId = dto.getLoginId();
         this.authority = (String) dto.getAttributes().get("authority");
         this.status = (String) dto.getAttributes().get("status");
