@@ -7,11 +7,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import store.cookshoong.www.cookshoongauth.adapter.ApiAdapter;
+import store.cookshoong.www.cookshoongauth.entity.RefreshToken;
 import store.cookshoong.www.cookshoongauth.jwt.JsonWebTokenProvider;
+import store.cookshoong.www.cookshoongauth.jwt.JwtResolver;
 import store.cookshoong.www.cookshoongauth.model.request.LoginRequestDto;
 import store.cookshoong.www.cookshoongauth.model.response.AuthenticationResponseDto;
 import store.cookshoong.www.cookshoongauth.model.response.LoginSuccessResponseDto;
+import store.cookshoong.www.cookshoongauth.model.response.TokenReissueResponseDto;
 import store.cookshoong.www.cookshoongauth.model.vo.AccountInfo;
+import store.cookshoong.www.cookshoongauth.model.vo.ParsedRefreshToken;
+import store.cookshoong.www.cookshoongauth.repository.RefreshTokenRepository;
 
 /**
  * 인증처리를 목적으로 하는 클래스.
@@ -25,6 +30,7 @@ public class AuthService {
     private final ApiAdapter apiAdapter;
     private final PasswordEncoder passwordEncoder;
     private final JsonWebTokenProvider jwtProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     /**
      * 인증 처리하는 메서드.
@@ -56,13 +62,45 @@ public class AuthService {
 
         String jti = UUID.randomUUID().toString();
         String accessToken = jwtProvider.createAccessToken(jti, authority);
-        String refreshToken = jwtProvider.createRefreshToken(jti, accountId, status, loginId);
+        String refreshToken = jwtProvider.createRefreshToken(jti, accountId, status, loginId, authority);
 
-        saveRefreshToken(jti, refreshToken);
+        // TODO : AOP로 빼내보기. 생성할 때마다 이전에 있던 거 지우고 저장하게끔. 그렇게해서 여기는 진짜 발급의 책임만 가지게. 관리의 책임을 넘김.
+        saveRefreshToken(refreshToken);
         return new LoginSuccessResponseDto(accessToken, refreshToken);
     }
 
-    public void saveRefreshToken(String jti, String refreshToken) {
-        // TODO: redis에 RefreshToken 저장.
+    /**
+     * 기존의 리프레쉬 토큰을 기반으로 새로운 액세스토큰과, 리프레쉬 토큰을 발급한다.
+     *
+     * @param oldToken the old token
+     * @return the token reissue response dto
+     */
+    public TokenReissueResponseDto reissueToken(String oldToken) {
+        ParsedRefreshToken oldParsedToken = JwtResolver.resolveToken(oldToken, ParsedRefreshToken.class);
+        if (oldParsedToken.getAccountId() == null || oldParsedToken.getStatus() == null
+            || oldParsedToken.getLoginId() == null) {
+            throw new RefreshTokenValidationException();
+        }
+
+        refreshTokenRepository.deleteById(oldParsedToken.getJti());
+
+        String currentStatus = apiAdapter.fetchAccountStatus(oldParsedToken.getAccountId()).getStatus();
+
+        String newJti = UUID.randomUUID().toString();
+        String newAccessToken = jwtProvider.createAccessToken(newJti, oldParsedToken.getAuthority());
+        String newRefreshToken = jwtProvider.createRefreshToken(newJti, String.valueOf(oldParsedToken.getAccountId()),
+            currentStatus, oldParsedToken.getLoginId(), oldParsedToken.getAuthority());
+
+        saveRefreshToken(newRefreshToken);
+        return new TokenReissueResponseDto(newAccessToken, newRefreshToken);
+    }
+
+    /**
+     * 리프레쉬토큰을 레디스에 저장한다.
+     *
+     * @param refreshToken the refresh token
+     */
+    public void saveRefreshToken(String refreshToken) {
+        refreshTokenRepository.save(RefreshToken.createRefreshToken(refreshToken));
     }
 }
