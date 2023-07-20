@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import store.cookshoong.www.cookshoongauth.util.JwtFactory;
 
 /**
  * 특정 정보를 받아 JWT(Json Web Token)을 만들어주는 클래스.
