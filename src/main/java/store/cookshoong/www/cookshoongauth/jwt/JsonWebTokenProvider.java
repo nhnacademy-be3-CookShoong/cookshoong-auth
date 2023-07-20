@@ -31,7 +31,9 @@ public class JsonWebTokenProvider {
     }
 
     private String createAccessToken(Map<String, Object> payloads) {
-        return JwtFactory.createToken(Map.of(), payloads, jwtProperties.getSecret(), jwtProperties.getAccessTokenTtl());
+        String secret = jwtProperties.getJwtSecret().getAccessSecret();
+        Long ttl = jwtProperties.getJwtTtl().getAccessTokenTtl();
+        return JwtFactory.createToken(Map.of(), payloads, secret, ttl);
     }
 
     /**
@@ -43,17 +45,19 @@ public class JsonWebTokenProvider {
      * @param loginId   the login id
      * @return the string
      */
-    public String createRefreshToken(String jti, String accountId, String status, String loginId) {
+    public String createRefreshToken(String jti, String accountId, String status, String loginId, String authority) {
         Map<String, Object> payloads = new HashMap<>();
         payloads.put("jti", jti);
         payloads.put("accountId", accountId);
         payloads.put("status", status);
         payloads.put("loginId", loginId);
+        payloads.put("authority", authority);
         return createRefreshToken(payloads);
     }
 
     private String createRefreshToken(Map<String, Object> payloads) {
-        return JwtFactory.createToken(Map.of(), payloads, jwtProperties.getSecret(),
-            jwtProperties.getRefreshTokenTtl());
+        String secret = jwtProperties.getJwtSecret().getRefreshSecret();
+        Long ttl = jwtProperties.getJwtTtl().getRefreshTokenTtl();
+        return JwtFactory.createToken(Map.of(), payloads, secret, ttl);
     }
 }
