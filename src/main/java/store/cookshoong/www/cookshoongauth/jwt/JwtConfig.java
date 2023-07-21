@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import store.cookshoong.www.cookshoongauth.skm.SKMService;
 import store.cookshoong.www.cookshoongauth.util.Times;
 
@@ -29,10 +28,8 @@ public class JwtConfig {
      * @throws JsonProcessingException the json processing exception
      */
     @Bean
-//    @Profile("!default")
     public JwtProperties jwtProperties(@Value("${cookshoong.skm.keyid.jwt}") String jwtKeyid,
-                                       SKMService skmService)
-        throws JsonProcessingException {
+                                       SKMService skmService) throws JsonProcessingException {
         JwtSecret jwtSecret = skmService.fetchSecrets(jwtKeyid, JwtSecret.class);
         JwtTtl jwtTtl = new JwtTtl(Times.HOUR, 24 * Times.HOUR);
         return new JwtProperties(jwtSecret, jwtTtl);

@@ -22,6 +22,14 @@ import store.cookshoong.www.cookshoongauth.skm.SKMService;
 @Configuration
 public class RedisConfig {
 
+    /**
+     * skm 으로부터 레디스 설정정보를 가져온다.
+     *
+     * @param redisKeyid the redis keyid
+     * @param skmService the skm service
+     * @return the redis properties
+     * @throws JsonProcessingException the json processing exception
+     */
     @Bean
     @Profile("!default")
     public RedisProperties redisProperties(@Value("${cookshoong.skm.keyid.redis}") String redisKeyid,

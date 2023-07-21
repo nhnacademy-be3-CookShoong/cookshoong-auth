@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
+import store.cookshoong.www.cookshoongauth.exeption.InvalidTokenTypeException;
 import store.cookshoong.www.cookshoongauth.exeption.LoginValidationException;
 import store.cookshoong.www.cookshoongauth.service.RefreshTokenValidationException;
 
@@ -21,7 +22,8 @@ public class ControllerExceptionAdvice {
             .build();
     }
 
-    @ExceptionHandler({LoginValidationException.class, RefreshTokenValidationException.class})
+    @ExceptionHandler({LoginValidationException.class, RefreshTokenValidationException.class,
+        InvalidTokenTypeException.class})
     public ResponseEntity<Void> badRequest() {
         return ResponseEntity.badRequest()
             .build();
