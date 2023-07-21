@@ -2,6 +2,7 @@ package store.cookshoong.www.cookshoongauth.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -15,9 +16,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Constructor;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.platform.commons.util.ReflectionUtils;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -47,6 +51,7 @@ import store.cookshoong.www.cookshoongauth.jwt.JwtProperties;
 import store.cookshoong.www.cookshoongauth.model.request.LoginRequestDto;
 import store.cookshoong.www.cookshoongauth.model.response.AuthenticationResponseDto;
 import store.cookshoong.www.cookshoongauth.model.response.LoginSuccessResponseDto;
+import store.cookshoong.www.cookshoongauth.model.response.TokenReissueResponseDto;
 import store.cookshoong.www.cookshoongauth.model.vo.AccountInfo;
 import store.cookshoong.www.cookshoongauth.service.AuthService;
 
@@ -57,7 +62,7 @@ import store.cookshoong.www.cookshoongauth.service.AuthService;
  * @since 2023.07.15
  */
 @WebMvcTest(AuthController.class)
-@Import({JwtProperties.class, SecurityConfig.class})
+@Import({SecurityConfig.class})
 class AuthControllerTest {
     @Autowired
     MockMvc mockMvc;
@@ -71,14 +76,19 @@ class AuthControllerTest {
     @DisplayName("로그인 - 검증 성공일 때")
     @WithMockUser
     void login() throws Exception {
-        // ISSUE: Body가 비어서 옴. (테스트환경에서만)
         LoginRequestDto testDto = ReflectionUtils.newInstance(LoginRequestDto.class);
         ReflectionTestUtils.setField(testDto, "loginId", "testUser1");
         ReflectionTestUtils.setField(testDto, "password", "1234");
 
+        AuthenticationResponseDto testResponseDto = mock(AuthenticationResponseDto.class);
+        when(testResponseDto.getLoginId()).thenReturn("testUser1");
+        when(testResponseDto.getAttributes()).thenReturn(Map.of("authority", "CUSTOMER"));
+        when(testResponseDto.getPassword()).thenReturn("1234");
+        AccountInfo testAccountInfo = new AccountInfo(testResponseDto);
+
         LoginSuccessResponseDto expect = new LoginSuccessResponseDto("accessToken", "refreshToken");
-        AccountInfo testAccountInfo = mock(AccountInfo.class);
-        doReturn(testAccountInfo).when(authService).executeAuthentication(testDto);
+
+        doReturn(testAccountInfo).when(authService).executeAuthentication(any(LoginRequestDto.class));
         doReturn(expect).when(authService).issueTokens(testAccountInfo);
 
         RequestBuilder request = MockMvcRequestBuilders.post("/auth/login")
@@ -87,14 +97,15 @@ class AuthControllerTest {
 
         mockMvc.perform(request)
             .andExpect(status().isOk())
+            .andExpect(jsonPath("$.accessToken").value(expect.getAccessToken()))
+            .andExpect(jsonPath("$.refreshToken").value(expect.getRefreshToken()))
             .andDo(print());
     }
 
     @Test
     @DisplayName("로그인 - 검증 실패일 때")
     @WithMockUser
-    void login2() throws Exception {
-        // ISSUE: Body가 비어서 옴. (테스트환경에서만)
+    void login_2() throws Exception {
         LoginRequestDto testDto = ReflectionUtils.newInstance(LoginRequestDto.class);
         ReflectionTestUtils.setField(testDto, "loginId", "testUser1");
         ReflectionTestUtils.setField(testDto, "password", "12321532");
@@ -107,6 +118,43 @@ class AuthControllerTest {
 
         mockMvc.perform(request)
             .andExpect(status().isNotFound())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("재발급 - 헤더에 제대로 된 토큰값이 들어온 경우")
+    @WithMockUser
+    void reissue() throws Exception {
+        TokenReissueResponseDto expect = new TokenReissueResponseDto("accessToken",
+            "refreshToken");
+        doReturn(expect).when(authService).reissueToken(anyString());
+
+        RequestBuilder request = MockMvcRequestBuilders.get("/auth/reissue")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer " + "ValidToken");
+
+        mockMvc.perform(request)
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.accessToken").value(expect.getAccessToken()))
+            .andExpect(jsonPath("$.refreshToken").value(expect.getRefreshToken()))
+            .andDo(print());
+    }
+
+    @DisplayName("재발급 - 헤더에 Bearer 타입이 아닌 값이 들어온 경우")
+    @WithMockUser
+    @ParameterizedTest
+    @ValueSource(strings = {"", "Basic ", "Digest ", "HOBA ", "Mutual ", "AWS4-HMAC-SHA256 ", "asdqwg"})
+    void reissue_2(String header) throws Exception {
+        TokenReissueResponseDto expect = new TokenReissueResponseDto("accessToken",
+            "refreshToken");
+        doReturn(expect).when(authService).reissueToken(anyString());
+
+        RequestBuilder request = MockMvcRequestBuilders.get("/auth/reissue")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", header + "ValidToken");
+
+        mockMvc.perform(request)
+            .andExpect(status().isBadRequest())
             .andDo(print());
     }
 }

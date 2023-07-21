@@ -2,16 +2,22 @@ package store.cookshoong.www.cookshoongauth.controller;
 
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
+import store.cookshoong.www.cookshoongauth.exeption.InvalidTokenTypeException;
 import store.cookshoong.www.cookshoongauth.exeption.LoginValidationException;
 import store.cookshoong.www.cookshoongauth.model.request.LoginRequestDto;
 import store.cookshoong.www.cookshoongauth.model.response.LoginSuccessResponseDto;
+import store.cookshoong.www.cookshoongauth.model.response.TokenReissueResponseDto;
 import store.cookshoong.www.cookshoongauth.model.vo.AccountInfo;
 import store.cookshoong.www.cookshoongauth.service.AuthService;
 
@@ -21,11 +27,13 @@ import store.cookshoong.www.cookshoongauth.service.AuthService;
  * @author koesnam (추만석)
  * @since 2023.07.13
  */
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
+    private static final int TOKEN_START_INDEX = 7;
 
     /**
      * 로그인 처리에 대한 엔드포인트.
@@ -45,5 +53,20 @@ public class AuthController {
 
         AccountInfo accountInfo = authService.executeAuthentication(loginRequestDto);
         return ResponseEntity.ok(authService.issueTokens(accountInfo));
+    }
+
+    /**
+     * 리프레쉬 토큰을 재발급하는 엔드포인트.
+     *
+     * @param authorization the authorization
+     * @return the response entity
+     */
+    @GetMapping("/reissue")
+    public ResponseEntity<TokenReissueResponseDto> reissue(@RequestHeader("Authorization") String authorization) {
+        if (!StringUtils.startsWithIgnoreCase(authorization, "Bearer ")) {
+            throw new InvalidTokenTypeException(authorization.split(" ")[0]);
+        }
+        String refreshToken = authorization.substring(TOKEN_START_INDEX);
+        return ResponseEntity.ok(authService.reissueToken(refreshToken));
     }
 }
