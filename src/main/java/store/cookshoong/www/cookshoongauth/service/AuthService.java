@@ -64,7 +64,7 @@ public class AuthService {
         String accessToken = jwtProvider.createAccessToken(jti, authority);
         String refreshToken = jwtProvider.createRefreshToken(jti, accountId, status, loginId, authority);
 
-        // TODO : AOP로 빼내보기. 생성할 때마다 이전에 있던 거 지우고 저장하게끔. 그렇게해서 여기는 진짜 발급의 책임만 가지게. 관리의 책임을 넘김.
+        // TODO : AOP로 빼내보기. 생성할 때마다 이전에 있던 거 지우고 저장하게끔
         saveRefreshToken(refreshToken);
         return new LoginSuccessResponseDto(accessToken, refreshToken);
     }
