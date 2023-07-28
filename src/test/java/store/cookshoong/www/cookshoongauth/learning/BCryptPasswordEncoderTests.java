@@ -33,8 +33,8 @@ class BCryptPasswordEncoderTests {
         BCryptPasswordEncoder aEncoder = new BCryptPasswordEncoder();
         BCryptPasswordEncoder bEncoder = new BCryptPasswordEncoder();
 
-        String password = "1234";
-        assertThat(aEncoder.encode(password), is(not(equalTo(bEncoder.encode(password)))));
+        String tempPwd = "1234";
+        assertThat(aEncoder.encode(tempPwd), is(not(equalTo(bEncoder.encode(tempPwd)))));
     }
 
     @Test
@@ -42,10 +42,10 @@ class BCryptPasswordEncoderTests {
     void test3() {
         BCryptPasswordEncoder aEncoder = new BCryptPasswordEncoder();
 
-        String password = "1234";
-        String encodedPassword = "$2a$10$30tERj8td6hFOOVnsYjJn.YF7rcdh53Opow6B//OUgviRfdVqFi0W";
-
-        assertTrue(aEncoder.matches(password, encodedPassword));
-        assertFalse(aEncoder.matches(encodedPassword, encodedPassword));
+        String tempPwd = "1234";
+        String encodedPwd = "$2a$10$30tERj8td6hFOOVnsYjJn.YF7rcdh53Opow6B//OUgviRfdVqFi0W";
+        System.out.println(aEncoder.encode("12345"));
+        assertTrue(aEncoder.matches(tempPwd, encodedPwd));
+        assertFalse(aEncoder.matches(encodedPwd, encodedPwd));
     }
 }

@@ -38,8 +38,13 @@ class JwtFactoryTest {
     @Test
     @DisplayName("HMAC-SHA 알고리즘은 256bit 가 넘어야 한다. ")
     void test3() {
+        Map<String, Object> emptyHeader= Map.of();
+        Map<String, Object> payloads = Map.of("accountId", 1L);
+        String secret = "ItislessThan256Bit";
+        Long ttl = 10L;
+
         assertThrows(WeakKeyException.class,
-            () -> JwtFactory.createToken(Map.of(), Map.of("accountId", 1L),
-                "ItislessThan256Bit", 10L));
+            () -> JwtFactory.createToken(emptyHeader, payloads, secret, ttl)
+        );
     }
 }
