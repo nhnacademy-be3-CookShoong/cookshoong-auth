@@ -10,11 +10,13 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.time.Duration;
 import javax.net.ssl.SSLContext;
+import lombok.RequiredArgsConstructor;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +25,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
+import store.cookshoong.www.cookshoongauth.interceptor.RestTemplateHeaderModifierInterceptor;
+import store.cookshoong.www.cookshoongauth.jwt.JsonWebTokenProvider;
 import store.cookshoong.www.cookshoongauth.skm.SecureKeyManagerProperties;
 
 /**
@@ -32,16 +36,20 @@ import store.cookshoong.www.cookshoongauth.skm.SecureKeyManagerProperties;
  * @since 2023.07.13
  */
 @Configuration
+@RequiredArgsConstructor
 public class RestTemplateConfig {
+
     /**
      * 기본 RestTemplate 을 Bean 으로 등록한다.
      *
      * @return the rest template
      */
     @Bean
-    public RestTemplate restTemplate() {
+    @ConditionalOnBean(JsonWebTokenProvider.class)
+    public RestTemplate restTemplate(JsonWebTokenProvider jwtProvider) {
         return new RestTemplateBuilder().setConnectTimeout(Duration.ofSeconds(10))
             .setReadTimeout(Duration.ofSeconds(10))
+            .additionalInterceptors(new RestTemplateHeaderModifierInterceptor(jwtProvider))
             .build();
     }
 
