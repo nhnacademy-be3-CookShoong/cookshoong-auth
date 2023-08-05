@@ -1,6 +1,7 @@
 package store.cookshoong.www.cookshoongauth.model.vo;
 
 import lombok.Getter;
+import store.cookshoong.www.cookshoongauth.model.response.AccountInfoResponseDto;
 import store.cookshoong.www.cookshoongauth.model.response.AuthenticationResponseDto;
 
 /**
@@ -26,5 +27,17 @@ public class AccountInfo {
         this.loginId = dto.getLoginId();
         this.authority = (String) dto.getAttributes().get("authority");
         this.status = (String) dto.getAttributes().get("status");
+    }
+
+    /**
+     * OAuth2 로그인 응답 객체를 통해 회원정보 생성.
+     *
+     * @param dto the dto
+     */
+    public AccountInfo(AccountInfoResponseDto dto) {
+        this.accountId = dto.getAccountId();
+        this.loginId = dto.getLoginId();
+        this.authority = dto.getAuthority();
+        this.status = dto.getStatus();
     }
 }

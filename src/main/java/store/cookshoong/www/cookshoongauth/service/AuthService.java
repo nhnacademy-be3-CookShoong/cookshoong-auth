@@ -11,6 +11,7 @@ import store.cookshoong.www.cookshoongauth.entity.RefreshToken;
 import store.cookshoong.www.cookshoongauth.jwt.JsonWebTokenProvider;
 import store.cookshoong.www.cookshoongauth.jwt.JwtResolver;
 import store.cookshoong.www.cookshoongauth.model.request.LoginRequestDto;
+import store.cookshoong.www.cookshoongauth.model.response.AccountInfoResponseDto;
 import store.cookshoong.www.cookshoongauth.model.response.AuthenticationResponseDto;
 import store.cookshoong.www.cookshoongauth.model.response.LoginSuccessResponseDto;
 import store.cookshoong.www.cookshoongauth.model.response.TokenReissueResponseDto;
@@ -46,6 +47,19 @@ public class AuthService {
         }
 
         return new AccountInfo(credential);
+    }
+
+    /**
+     * OAuth2로 로그인한 사용자의 정보를 가져오는 메서드.
+     *
+     * @param provider    the provider
+     * @param accountCode the account code
+     * @return the account info
+     */
+    public AccountInfo fetchAccountInfo(String provider, String accountCode) {
+        AccountInfoResponseDto response = apiAdapter.sendOAuthInfo(provider, accountCode);
+
+        return new AccountInfo(response);
     }
 
     /**

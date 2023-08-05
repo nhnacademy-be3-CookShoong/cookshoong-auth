@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import store.cookshoong.www.cookshoongauth.model.request.LoginRequestDto;
+import store.cookshoong.www.cookshoongauth.model.response.AccountInfoResponseDto;
 import store.cookshoong.www.cookshoongauth.model.response.AccountStatusResponseDto;
 import store.cookshoong.www.cookshoongauth.model.response.AuthenticationResponseDto;
 import store.cookshoong.www.cookshoongauth.property.ApiProperties;
@@ -64,7 +65,24 @@ public class ApiAdapter {
     }
 
     /**
+     * API 서버에서 OAuth2로 로그인한 사용자 정보를 가져오는 메서드.
      *
+     * @param provider    the provider
+     * @param accountCode the account code
+     * @return the account info response dto
      */
+    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
+    public AccountInfoResponseDto sendOAuthInfo(String provider, String accountCode) {
+        URI uri = UriComponentsBuilder.fromUriString(apiProperties.getGatewayUri())
+            .pathSegment("api")
+            .pathSegment("accounts")
+            .pathSegment("oauth")
+            .queryParam("accountCode", accountCode)
+            .queryParam("provider", provider)
+            .build()
+            .toUri();
+
+        return restTemplate.exchange(uri, HttpMethod.GET, HttpEntity.EMPTY, AccountInfoResponseDto.class)
+            .getBody();
     }
 }
