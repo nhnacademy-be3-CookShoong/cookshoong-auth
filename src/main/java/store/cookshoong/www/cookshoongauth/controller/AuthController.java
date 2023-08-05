@@ -63,7 +63,7 @@ public class AuthController {
      * @param provider    the provider
      * @return the response entity
      */
-    @GetMapping("/login/oauth")
+    @GetMapping("/login/oauth2")
     public ResponseEntity<LoginSuccessResponseDto> oauthLogin(@RequestHeader("X-Account-Code") String accountCode,
                                                               @RequestHeader("X-Provider") String provider) {
         if (!StringUtils.hasText(accountCode) || !StringUtils.hasText(provider)) {

@@ -76,7 +76,7 @@ public class ApiAdapter {
         URI uri = UriComponentsBuilder.fromUriString(apiProperties.getGatewayUri())
             .pathSegment("api")
             .pathSegment("accounts")
-            .pathSegment("oauth")
+            .pathSegment("oauth2")
             .queryParam("accountCode", accountCode)
             .queryParam("provider", provider)
             .build()

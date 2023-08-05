@@ -184,7 +184,7 @@ class AuthControllerTest {
 
         String accountCode = "valid-accountCode";
 
-        RequestBuilder request = MockMvcRequestBuilders.get("/auth/login/oauth")
+        RequestBuilder request = MockMvcRequestBuilders.get("/auth/login/oauth2")
             .header("X-Account-Code", accountCode)
             .header("X-Provider", provider);
 
@@ -202,7 +202,7 @@ class AuthControllerTest {
     @DisplayName("OAuth2 로그인 - 필수값 누락 - 회원식별자 누락")
     @ValueSource(strings = {"      ", ""})
     void oauthLogin_2(String accountCode) throws Exception {
-        RequestBuilder request = MockMvcRequestBuilders.get("/auth/login/oauth")
+        RequestBuilder request = MockMvcRequestBuilders.get("/auth/login/oauth2")
             .header("X-Account-Code", accountCode)
             .header("X-Provider", "payco");
 
@@ -215,7 +215,7 @@ class AuthControllerTest {
     @DisplayName("OAuth2 로그인 - 필수값 누락 - 회원식별자 누락")
     @ValueSource(strings = {"      ", ""})
     void oauthLogin_3(String provider) throws Exception {
-        RequestBuilder request = MockMvcRequestBuilders.get("/auth/login/oauth")
+        RequestBuilder request = MockMvcRequestBuilders.get("/auth/login/oauth2")
             .header("X-Account-Code", "valid-account-code")
             .header("X-Provider", provider);
 
