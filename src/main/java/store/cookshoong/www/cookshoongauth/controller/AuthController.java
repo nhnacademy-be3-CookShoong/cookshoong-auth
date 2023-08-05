@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
+import store.cookshoong.www.cookshoongauth.exeption.InvalidAccountCodeException;
 import store.cookshoong.www.cookshoongauth.exeption.InvalidTokenTypeException;
 import store.cookshoong.www.cookshoongauth.exeption.LoginValidationException;
 import store.cookshoong.www.cookshoongauth.model.request.LoginRequestDto;
@@ -52,6 +53,24 @@ public class AuthController {
         }
 
         AccountInfo accountInfo = authService.executeAuthentication(loginRequestDto);
+        return ResponseEntity.ok(authService.issueTokens(accountInfo));
+    }
+
+    /**
+     * OAuth 로그인시 사용자 정보 조회를 위한 엔드포인트.
+     *
+     * @param accountCode the account code
+     * @param provider    the provider
+     * @return the response entity
+     */
+    @GetMapping("/login/oauth")
+    public ResponseEntity<LoginSuccessResponseDto> oauthLogin(@RequestHeader("X-Account-Code") String accountCode,
+                                                              @RequestHeader("X-Provider") String provider) {
+        if (!StringUtils.hasText(accountCode) || !StringUtils.hasText(provider)) {
+            throw new InvalidAccountCodeException();
+        }
+
+        AccountInfo accountInfo = authService.fetchAccountInfo(provider, accountCode);
         return ResponseEntity.ok(authService.issueTokens(accountInfo));
     }
 
