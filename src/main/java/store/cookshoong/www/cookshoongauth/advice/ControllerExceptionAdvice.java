@@ -1,9 +1,11 @@
 package store.cookshoong.www.cookshoongauth.advice;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
+import store.cookshoong.www.cookshoongauth.exeption.InvalidAccountCodeException;
 import store.cookshoong.www.cookshoongauth.exeption.InvalidTokenTypeException;
 import store.cookshoong.www.cookshoongauth.exeption.LoginValidationException;
 import store.cookshoong.www.cookshoongauth.service.RefreshTokenValidationException;
@@ -17,13 +19,13 @@ import store.cookshoong.www.cookshoongauth.service.RefreshTokenValidationExcepti
 @ControllerAdvice
 public class ControllerExceptionAdvice {
     @ExceptionHandler(HttpClientErrorException.class)
-    public ResponseEntity<Void> notfound() {
-        return ResponseEntity.notFound()
+    public ResponseEntity<Void> apiCallException(HttpClientErrorException e) {
+        return ResponseEntity.status(e.getStatusCode())
             .build();
     }
 
     @ExceptionHandler({LoginValidationException.class, RefreshTokenValidationException.class,
-        InvalidTokenTypeException.class})
+        InvalidTokenTypeException.class, MissingRequestHeaderException.class, InvalidAccountCodeException.class})
     public ResponseEntity<Void> badRequest() {
         return ResponseEntity.badRequest()
             .build();
