@@ -3,10 +3,13 @@ package store.cookshoong.www.cookshoongauth.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
@@ -18,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpClientErrorException;
@@ -27,6 +31,7 @@ import store.cookshoong.www.cookshoongauth.jwt.JwtProperties;
 import store.cookshoong.www.cookshoongauth.jwt.JwtSecret;
 import store.cookshoong.www.cookshoongauth.jwt.JwtTtl;
 import store.cookshoong.www.cookshoongauth.model.request.LoginRequestDto;
+import store.cookshoong.www.cookshoongauth.model.response.AccountInfoResponseDto;
 import store.cookshoong.www.cookshoongauth.model.response.AccountStatusResponseDto;
 import store.cookshoong.www.cookshoongauth.model.response.AuthenticationResponseDto;
 import store.cookshoong.www.cookshoongauth.model.response.LoginSuccessResponseDto;
@@ -42,14 +47,14 @@ import store.cookshoong.www.cookshoongauth.repository.RefreshTokenRepository;
  */
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
+    @Spy
+    static JsonWebTokenProvider jwtProvider = new JsonWebTokenProvider(mock(JwtProperties.class));
     @Mock
     ApiAdapter apiAdapter;
     @Mock
     PasswordEncoder passwordEncoder;
     @Mock
     RefreshTokenRepository refreshTokenRepository;
-    @Spy
-    static JsonWebTokenProvider jwtProvider = new JsonWebTokenProvider(mock(JwtProperties.class));
     @InjectMocks
     AuthService authService;
 
@@ -152,6 +157,39 @@ class AuthServiceTest {
         assertAll(
             () -> assertThat(actual.getAccessToken()).isNotBlank(),
             () -> assertThat(actual.getRefreshToken()).isNotBlank()
+        );
+    }
+
+    @Test
+    @DisplayName("OAuth 회원정보 조회 - 없는 회원 조회")
+    void fetchAccountInfo() {
+        when(apiAdapter.sendOAuthInfo(anyString(), anyString()))
+            .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        assertThatThrownBy(
+            () -> authService.fetchAccountInfo("payco", "invalidAccountCode"))
+            .isInstanceOf(HttpClientErrorException.class)
+            .hasMessageContaining("404");
+    }
+
+    @Test
+    @DisplayName("OAuth 회원정보 조회 - 있는 회원 조회")
+    void fetchAccountInfo_2() {
+        AccountInfoResponseDto expect = ReflectionUtils.newInstance(AccountInfoResponseDto.class);
+        ReflectionTestUtils.setField(expect, "accountId", "1");
+        ReflectionTestUtils.setField(expect, "loginId", "tempUser");
+        ReflectionTestUtils.setField(expect, "authority", "CUSTOMER");
+        ReflectionTestUtils.setField(expect, "status", "ACTIVE");
+
+        when(apiAdapter.sendOAuthInfo(anyString(), anyString())).thenReturn(expect);
+
+        AccountInfo actual = authService.fetchAccountInfo("payco", "validAccountCode");
+
+        assertAll(
+            () -> assertSame(actual.getAccountId(), expect.getAccountId()),
+            () -> assertSame(actual.getAuthority(), expect.getAuthority()),
+            () -> assertSame(actual.getLoginId(), expect.getLoginId()),
+            () -> assertSame(actual.getStatus(), expect.getStatus())
         );
     }
 }

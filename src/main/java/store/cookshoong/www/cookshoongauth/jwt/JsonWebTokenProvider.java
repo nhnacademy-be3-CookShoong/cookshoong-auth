@@ -37,7 +37,7 @@ public class JsonWebTokenProvider {
     }
 
     /**
-     * 토큰 식별자와 회원 시퀀스, 회원 상태, 회원의 아이디를 담은 액세스 토큰을 만든다.
+     * 토큰 식별자와 회원 시퀀스, 회원 상태, 회원의 아이디를 담은 리프레쉬 토큰을 만든다.
      *
      * @param jti       the jti
      * @param accountId the account id
