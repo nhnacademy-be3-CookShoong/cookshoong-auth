@@ -22,6 +22,7 @@ class JwtFactoryTest {
 
     JsonWebTokenProvider jwtProvider;
     JwtSecret jwtSecret;
+
     @BeforeEach
     void setup() {
         jwtSecret = new JwtSecret("qwertyuiopasdfghjklzxcvbnm123456", "qwertyuiopasdfghjklzxcvbnm123456");
