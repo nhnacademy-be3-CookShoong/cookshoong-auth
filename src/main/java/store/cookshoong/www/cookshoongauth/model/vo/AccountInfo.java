@@ -11,7 +11,7 @@ import store.cookshoong.www.cookshoongauth.model.response.AuthenticationResponse
  * @since 2023.07.15
  */
 @Getter
-public class AccountInfo {
+public class AccountInfo implements AccountIdAware {
     private final String accountId;
     private final String loginId;
     private final String authority;
