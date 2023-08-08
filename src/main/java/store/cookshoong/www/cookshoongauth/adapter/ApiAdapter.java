@@ -24,6 +24,7 @@ import store.cookshoong.www.cookshoongauth.property.ApiProperties;
 public class ApiAdapter {
     private final RestTemplate restTemplate;
     private final ApiProperties apiProperties;
+    private static final String ACCOUNT_API_PREFIX = "api/accounts";
 
     /**
      * 자격증명정보를 백엔드 서버에 호출한다.
@@ -33,8 +34,7 @@ public class ApiAdapter {
      */
     public AuthenticationResponseDto fetchCredential(LoginRequestDto loginRequestDto) {
         URI uri = UriComponentsBuilder.fromUriString(apiProperties.getGatewayUri())
-            .pathSegment("api")
-            .pathSegment("accounts")
+            .pathSegment(ACCOUNT_API_PREFIX)
             .pathSegment("{loginId}")
             .path("auth")
             .buildAndExpand(loginRequestDto.getLoginId())
@@ -53,8 +53,7 @@ public class ApiAdapter {
      */
     public AccountStatusResponseDto fetchAccountStatus(Long accountId) {
         URI uri = UriComponentsBuilder.fromUriString(apiProperties.getGatewayUri())
-            .pathSegment("api")
-            .pathSegment("accounts")
+            .pathSegment(ACCOUNT_API_PREFIX)
             .pathSegment("{accountId}")
             .pathSegment("status")
             .buildAndExpand(accountId)
@@ -74,8 +73,7 @@ public class ApiAdapter {
     @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
     public AccountInfoResponseDto sendOAuthInfo(String provider, String accountCode) {
         URI uri = UriComponentsBuilder.fromUriString(apiProperties.getGatewayUri())
-            .pathSegment("api")
-            .pathSegment("accounts")
+            .pathSegment(ACCOUNT_API_PREFIX)
             .pathSegment("oauth2")
             .queryParam("accountCode", accountCode)
             .queryParam("provider", provider)
@@ -84,5 +82,21 @@ public class ApiAdapter {
 
         return restTemplate.exchange(uri, HttpMethod.GET, HttpEntity.EMPTY, AccountInfoResponseDto.class)
             .getBody();
+    }
+
+    /**
+     * 마지막 로그인 날짜를 위해 로그인 성공을 Backend 서버에 알리는 메서드.
+     *
+     * @param accountId the account id
+     */
+    public void sendLoginSuccess(String accountId) {
+        URI uri = UriComponentsBuilder.fromUriString(apiProperties.getGatewayUri())
+            .pathSegment(ACCOUNT_API_PREFIX)
+            .pathSegment("{accountId}")
+            .pathSegment("auth-success")
+            .buildAndExpand(accountId)
+            .toUri();
+
+        restTemplate.exchange(uri, HttpMethod.PUT, HttpEntity.EMPTY, Void.class);
     }
 }
