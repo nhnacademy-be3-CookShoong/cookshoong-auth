@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 /**
  * 애플리케이션 엔트리포인트.
@@ -13,6 +14,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  */
 @ConfigurationPropertiesScan
 @EnableDiscoveryClient
+@EnableAspectJAutoProxy
 @SpringBootApplication
 public class CookshoongAuthApplication {
 
