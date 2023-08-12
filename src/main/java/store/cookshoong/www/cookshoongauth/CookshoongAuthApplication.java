@@ -1,5 +1,7 @@
 package store.cookshoong.www.cookshoongauth;
 
+import java.util.TimeZone;
+import javax.annotation.PostConstruct;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
@@ -17,6 +19,10 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @EnableAspectJAutoProxy
 @SpringBootApplication
 public class CookshoongAuthApplication {
+    @PostConstruct
+    void started() {
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(CookshoongAuthApplication.class, args);
