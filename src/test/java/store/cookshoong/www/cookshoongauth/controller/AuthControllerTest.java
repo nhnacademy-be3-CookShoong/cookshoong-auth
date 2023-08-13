@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
+import javax.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -143,6 +144,7 @@ class AuthControllerTest {
 
         RequestBuilder request = MockMvcRequestBuilders.get("/auth/reissue")
             .contentType(MediaType.APPLICATION_JSON)
+            .cookie(new Cookie("CRT", "refreshToken"))
             .header("Authorization", "Bearer " + "ValidToken");
 
         mockMvc.perform(request)
