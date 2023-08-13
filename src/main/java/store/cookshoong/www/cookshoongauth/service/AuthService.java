@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import store.cookshoong.www.cookshoongauth.adapter.ApiAdapter;
+import store.cookshoong.www.cookshoongauth.aop.LoginProcess;
 import store.cookshoong.www.cookshoongauth.entity.RefreshToken;
 import store.cookshoong.www.cookshoongauth.jwt.JsonWebTokenProvider;
 import store.cookshoong.www.cookshoongauth.jwt.JwtResolver;
@@ -39,6 +40,7 @@ public class AuthService {
      * @param loginRequestDto the login request dto
      * @return the account info
      */
+    @LoginProcess
     public AccountInfo executeAuthentication(LoginRequestDto loginRequestDto) {
         AuthenticationResponseDto credential = apiAdapter.fetchCredential(loginRequestDto);
 
@@ -56,6 +58,7 @@ public class AuthService {
      * @param accountCode the account code
      * @return the account info
      */
+    @LoginProcess
     public AccountInfo fetchAccountInfo(String provider, String accountCode) {
         AccountInfoResponseDto response = apiAdapter.sendOAuthInfo(provider, accountCode);
 

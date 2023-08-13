@@ -31,7 +31,7 @@ public class JwtConfig {
     public JwtProperties jwtProperties(@Value("${cookshoong.skm.keyid.jwt}") String jwtKeyid,
                                        SKMService skmService) throws JsonProcessingException {
         JwtSecret jwtSecret = skmService.fetchSecrets(jwtKeyid, JwtSecret.class);
-        JwtTtl jwtTtl = new JwtTtl(Times.HOUR, 24 * Times.HOUR);
+        JwtTtl jwtTtl = new JwtTtl(30 * Times.MINUTE,  2 * Times.HOUR);
         return new JwtProperties(jwtSecret, jwtTtl);
     }
 }
