@@ -36,8 +36,19 @@ class JwtFactoryTest {
     }
 
     @Test
-    @DisplayName("HMAC-SHA 알고리즘은 256bit 가 넘어야 한다. ")
+    @DisplayName("Secret 을 키로 만들 때 암호화 알고리즘이 사용된다." +
+        " 각 암호화 알고리즘에 필요한 Secret 의 길이가 있으며 HMAC-SHA 알고리즘에서는 256 bit가 넘어야 한다. " +
+        " 자바 String은 char의 배열이므로 한글자당 1바이트를 가진다.")
     void test3() {
+        String testSecret = "TokenSecretMustBeLargerThan256Bi";
+        assertThat(testSecret.length(), is(32));
+        assertDoesNotThrow(() -> JwtFactory.createToken(Map.of(), Map.of("accountId", 1L),
+            "TokenSecretMustBeLargerThan256Bi", 10L));
+    }
+
+    @Test
+    @DisplayName("HMAC-SHA 알고리즘은 256bit 가 넘어야 한다. ")
+    void test4() {
         Map<String, Object> emptyHeader = Map.of();
         Map<String, Object> payloads = Map.of("accountId", 1L);
         String secret = "ItislessThan256Bit";
