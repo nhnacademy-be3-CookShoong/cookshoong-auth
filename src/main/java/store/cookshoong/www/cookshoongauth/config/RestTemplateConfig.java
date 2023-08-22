@@ -48,7 +48,7 @@ public class RestTemplateConfig {
     @ConditionalOnBean(JsonWebTokenProvider.class)
     public RestTemplate restTemplate(JsonWebTokenProvider jwtProvider) {
         return new RestTemplateBuilder().setConnectTimeout(Duration.ofSeconds(10))
-            .setReadTimeout(Duration.ofSeconds(10))
+            .setReadTimeout(Duration.ofMinutes(1))
             .additionalInterceptors(new RestTemplateHeaderModifierInterceptor(jwtProvider))
             .build();
     }
