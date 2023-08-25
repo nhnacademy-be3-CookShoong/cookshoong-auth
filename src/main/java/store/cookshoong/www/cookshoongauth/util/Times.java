@@ -9,7 +9,7 @@ package store.cookshoong.www.cookshoongauth.util;
 public class Times {
     private Times() {}
 
-    private static final Long SECOND = 1000L;
+    public static final Long SECOND = 1000L;
     public static final Long MINUTE = SECOND * 60;
     public static final Long HOUR = MINUTE * 60;
     public static final Long DAY = HOUR * 24;
