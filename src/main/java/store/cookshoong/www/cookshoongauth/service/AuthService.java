@@ -93,7 +93,7 @@ public class AuthService {
      * @return the token reissue response dto
      */
     public TokenReissueResponseDto reissueToken(String oldToken) {
-        ParsedRefreshToken oldParsedToken = JwtResolver.resolveToken(oldToken, ParsedRefreshToken.class);
+        ParsedRefreshToken oldParsedToken = JwtResolver.resolveRefreshToken(oldToken);
         if (oldParsedToken.getAccountId() == null || oldParsedToken.getStatus() == null
             || oldParsedToken.getLoginId() == null) {
             throw new RefreshTokenValidationException();
