@@ -31,7 +31,7 @@ public class RefreshToken {
      * @return the refresh token
      */
     public static RefreshToken createRefreshToken(String rawRefreshToken) {
-        ParsedRefreshToken parsedRefreshToken = JwtResolver.resolveToken(rawRefreshToken, ParsedRefreshToken.class);
+        ParsedRefreshToken parsedRefreshToken = JwtResolver.resolveRefreshToken(rawRefreshToken);
         String jti = parsedRefreshToken.getJti();
         Long expireTime = parsedRefreshToken.getExp() - (System.currentTimeMillis() / 1000L);
         return new RefreshToken(jti, rawRefreshToken, expireTime);
