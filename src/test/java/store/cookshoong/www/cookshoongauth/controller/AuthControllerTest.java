@@ -1,5 +1,6 @@
 package store.cookshoong.www.cookshoongauth.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -27,11 +28,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.client.HttpClientErrorException;
 import store.cookshoong.www.cookshoongauth.config.SecurityConfig;
 import store.cookshoong.www.cookshoongauth.exeption.InvalidAccountCodeException;
+import store.cookshoong.www.cookshoongauth.jwt.JwtValidator;
 import store.cookshoong.www.cookshoongauth.model.request.LoginRequestDto;
 import store.cookshoong.www.cookshoongauth.model.response.AccountInfoResponseDto;
 import store.cookshoong.www.cookshoongauth.model.response.AuthenticationResponseDto;
@@ -56,6 +59,8 @@ class AuthControllerTest {
 
     @MockBean
     AuthService authService;
+    @MockBean
+    JwtValidator jwtValidator;
 
     @Test
     @DisplayName("로그인 - 검증 성공일 때")
@@ -141,6 +146,7 @@ class AuthControllerTest {
         TokenReissueResponseDto expect = new TokenReissueResponseDto("accessToken",
             "refreshToken");
         doReturn(expect).when(authService).reissueToken(anyString());
+        doReturn(true).when(jwtValidator).validatePairToken(anyString(), anyString());
 
         RequestBuilder request = MockMvcRequestBuilders.get("/auth/reissue")
             .contentType(MediaType.APPLICATION_JSON)
@@ -168,7 +174,24 @@ class AuthControllerTest {
 
         mockMvc.perform(request)
             .andExpect(status().isBadRequest())
-            .andDo(print());
+            .andReturn();
+    }
+
+    @Test
+    @DisplayName("재발급 - 두 토큰값의 토큰 식별자가 다르게 들어오는 경우")
+    void reissue_3() throws Exception {
+        doReturn(false).when(jwtValidator).validatePairToken(anyString(), anyString());
+
+        RequestBuilder request = MockMvcRequestBuilders.get("/auth/reissue")
+            .contentType(MediaType.APPLICATION_JSON)
+            .cookie(new Cookie("CRT", "refreshToken"))
+            .header("Authorization", "Bearer " + "InvalidToken");
+
+        MvcResult result = mockMvc.perform(request)
+            .andExpect(status().isForbidden())
+            .andReturn();
+
+        assertThat(result.getResponse().getContentAsString()).isBlank();
     }
 
     @ParameterizedTest
