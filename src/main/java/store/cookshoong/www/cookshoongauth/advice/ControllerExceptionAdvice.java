@@ -28,8 +28,14 @@ public class ControllerExceptionAdvice {
     @ExceptionHandler({LoginValidationException.class, RefreshTokenValidationException.class,
         InvalidTokenTypeException.class, MissingRequestHeaderException.class, InvalidAccountCodeException.class,
         MissingRefreshTokenException.class})
-    public ResponseEntity<Void> badRequest() {
+    public ResponseEntity<Void> badRequest(Exception e) {
         return ResponseEntity.badRequest()
+            .build();
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Void> handleInternalServerError(Exception e) {
+        return ResponseEntity.internalServerError()
             .build();
     }
 }
