@@ -164,17 +164,13 @@ class AuthControllerTest {
     @ParameterizedTest
     @ValueSource(strings = {"", "Basic ", "Digest ", "HOBA ", "Mutual ", "AWS4-HMAC-SHA256 ", "asdqwg"})
     void reissue_2(String header) throws Exception {
-        TokenReissueResponseDto expect = new TokenReissueResponseDto("accessToken",
-            "refreshToken");
-        doReturn(expect).when(authService).reissueToken(anyString());
-
         RequestBuilder request = MockMvcRequestBuilders.get("/auth/reissue")
             .contentType(MediaType.APPLICATION_JSON)
-            .header("Authorization", header + "ValidToken");
+            .header("Authorization", header + "ValidToken")
+            .cookie(new Cookie("CRT", "refreshToken"));
 
         mockMvc.perform(request)
-            .andExpect(status().isBadRequest())
-            .andReturn();
+            .andExpect(status().isBadRequest());
     }
 
     @Test
